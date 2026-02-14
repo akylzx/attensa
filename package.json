@@ -1,0 +1,14 @@
+{
+  "name": "attensa",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "cd apps/desktop && npx electron-forge start",
+    "build": "npm run build -w packages/shared && npm run build -w apps/desktop",
+    "start": "cd apps/desktop && npx electron-forge start"
+  }
+}

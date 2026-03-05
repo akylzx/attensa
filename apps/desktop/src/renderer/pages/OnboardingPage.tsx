@@ -46,7 +46,7 @@ export function OnboardingPage({ onConsent }: Props) {
         {/* Logo mark */}
         <div className="relative mb-5">
           <div
-            className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-iris to-pine flex items-center justify-center shadow-lg shadow-iris/20 transition-all duration-1000 ${
+            className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-dim flex items-center justify-center shadow-lg shadow-accent/20 transition-all duration-1000 ${
               logoVisible ? 'rotate-0' : '-rotate-12'
             }`}
           >
@@ -74,7 +74,7 @@ export function OnboardingPage({ onConsent }: Props) {
           Attensa
         </h1>
         <p
-          className={`text-subtle text-sm mt-1 transition-all duration-700 delay-700 ${
+          className={`text-fg-muted text-sm mt-1 transition-all duration-700 delay-700 ${
             logoVisible ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -89,12 +89,12 @@ export function OnboardingPage({ onConsent }: Props) {
             consentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <div className="bg-surface rounded-2xl p-6 mb-6 border border-overlay">
+          <div className="bg-surface rounded-2xl p-6 mb-6 border border-fg-ghost">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-fg mb-4">
               Before we begin
             </h2>
 
-            <div className="space-y-3 text-sm text-subtle leading-relaxed">
+            <div className="space-y-3 text-sm text-fg-muted leading-relaxed">
               <p>
                 Attensa tracks your active applications and window titles during
                 Focus Time sessions to measure your focus patterns.
@@ -108,15 +108,15 @@ export function OnboardingPage({ onConsent }: Props) {
               </p>
             </div>
 
-            <div className="mt-5 border-t border-overlay pt-4">
+            <div className="mt-5 border-t border-fg-ghost pt-4">
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={accepted}
                   onChange={(e) => setAccepted(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-hl-med bg-overlay accent-iris cursor-pointer"
+                  className="mt-0.5 w-4 h-4 rounded border-fg-ghost bg-overlay accent-accent cursor-pointer"
                 />
-                <span className="text-sm text-subtle group-hover:text-fg transition-colors">
+                <span className="text-sm text-fg-muted group-hover:text-fg transition-colors">
                   I understand that Attensa will track my active applications
                   during Focus Time sessions and store this data locally.
                 </span>
@@ -127,7 +127,7 @@ export function OnboardingPage({ onConsent }: Props) {
           <button
             onClick={handleAgree}
             disabled={!accepted}
-            className="w-full py-4 rounded-xl font-semibold text-lg transition-all bg-iris text-base hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-xl font-semibold text-lg transition-all bg-accent text-white hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Get Started
           </button>

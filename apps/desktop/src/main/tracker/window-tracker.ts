@@ -8,6 +8,8 @@ import {
   WRITE_BUFFER_FLUSH_MS,
   BROWSER_BUNDLE_IDS,
   BROWSER_EXE_NAMES,
+  SELF_APP_BUNDLE_IDS,
+  SELF_APP_NAMES,
   extractSiteName,
 } from '@attensa/shared';
 import { getActiveTabUrl, siteNameFromUrl } from './browser-tab-resolver.js';
@@ -143,6 +145,9 @@ export class WindowTracker {
       const windowTitle = windowInfo.title || '';
       const bundleId = windowInfo.owner.bundleId
         || this.extractBundleId(windowInfo.owner.path || '');
+
+      // Skip self (Electron/Attensa) — don't track our own window
+      if (SELF_APP_BUNDLE_IDS.has(bundleId) || SELF_APP_NAMES.has(rawAppName)) return;
 
       // For browsers, query the actual tab URL via AppleScript, fall back to title parsing
       const isBrowser = BROWSER_BUNDLE_IDS.has(bundleId) || BROWSER_EXE_NAMES.has(bundleId);

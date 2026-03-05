@@ -1,30 +1,171 @@
 @import "tailwindcss";
 
-@theme {
-  --color-base: #232136;
-  --color-surface: #2a273f;
-  --color-overlay: #393552;
-  --color-muted: #6e6a86;
-  --color-subtle: #908caa;
-  --color-fg: #e0def4;
+/* ── Fonts ──────────────────────────────────────────────── */
 
-  --color-hl-low: #2a283e;
-  --color-hl-med: #44415a;
-  --color-hl-high: #56526e;
-
-  --color-love: #eb6f92;
-  --color-gold: #f6c177;
-  --color-rosette: #ea9a97;
-  --color-pine: #3e8fb0;
-  --color-foam: #9ccfd8;
-  --color-iris: #c4a7e7;
-
-  /* Muted accent variants for app color charts */
-  --color-iris-dim: #a890cc;
-  --color-foam-dim: #7eb3bd;
-  --color-pine-dim: #2f7090;
-  --color-gold-dim: #d4a45e;
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../fonts/InterVariable.woff2') format('woff2');
 }
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/JetBrainsMonoVariable.woff2') format('woff2');
+}
+
+/* ── Theme Tokens (Tailwind reference — generates utilities) ── */
+
+@theme {
+  /* Base surfaces */
+  --color-base: var(--t-base);
+  --color-surface: var(--t-surface);
+  --color-overlay: var(--t-overlay);
+  --color-elevated: var(--t-elevated);
+
+  /* Text hierarchy */
+  --color-fg: var(--t-fg);
+  --color-fg-muted: var(--t-fg-muted);
+  --color-fg-faint: var(--t-fg-faint);
+  --color-fg-ghost: var(--t-fg-ghost);
+
+  /* Primary accent */
+  --color-accent: var(--t-accent);
+  --color-accent-hover: var(--t-accent-hover);
+
+  /* Focus quality spectrum */
+  --color-focus-high: var(--t-focus-high);
+  --color-focus-mid: var(--t-focus-mid);
+  --color-focus-low: var(--t-focus-low);
+
+  /* Semantic signals */
+  --color-insight: var(--t-insight);
+  --color-streak: var(--t-streak);
+  --color-neutral: var(--t-neutral);
+
+  /* Dimmed chart variants */
+  --color-accent-dim: var(--t-accent-dim);
+  --color-focus-high-dim: var(--t-focus-high-dim);
+  --color-focus-mid-dim: var(--t-focus-mid-dim);
+  --color-focus-low-dim: var(--t-focus-low-dim);
+  --color-insight-dim: var(--t-insight-dim);
+  --color-streak-dim: var(--t-streak-dim);
+
+  /* Focus session overrides */
+  --color-base-focus: var(--t-base-focus);
+  --color-surface-focus: var(--t-surface-focus);
+
+  /* Elevation shadows */
+  --shadow-surface: var(--t-shadow-surface);
+  --shadow-overlay: var(--t-shadow-overlay);
+  --shadow-elevated: var(--t-shadow-elevated);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Font families */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+}
+
+/* ── Dark Theme (default) ──────────────────────────────── */
+
+:root {
+  --t-base: #161719;
+  --t-surface: #1E1F23;
+  --t-overlay: #272930;
+  --t-elevated: #2F3138;
+
+  --t-fg: #E8E9ED;
+  --t-fg-muted: #9B9DA6;
+  --t-fg-faint: #62656E;
+  --t-fg-ghost: #3E4148;
+
+  --t-accent: #7B8FFF;
+  --t-accent-hover: #8FA0FF;
+
+  --t-focus-high: #6DD4B1;
+  --t-focus-mid: #E4B76A;
+  --t-focus-low: #D96B6B;
+
+  --t-insight: #B4A0E5;
+  --t-streak: #E8A44A;
+  --t-neutral: #7C8291;
+
+  --t-accent-dim: #5D6FCC;
+  --t-focus-high-dim: #4FAF8E;
+  --t-focus-mid-dim: #C49950;
+  --t-focus-low-dim: #B85555;
+  --t-insight-dim: #9484C4;
+  --t-streak-dim: #C4883A;
+
+  --t-base-focus: #131416;
+  --t-surface-focus: #1A1B1F;
+
+  --t-shadow-surface: 0 1px 2px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --t-shadow-overlay: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --t-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  /* Border opacities (used inline) */
+  --t-border-subtle: rgba(255, 255, 255, 0.03);
+  --t-border-light: rgba(255, 255, 255, 0.04);
+  --t-border-medium: rgba(255, 255, 255, 0.06);
+  --t-border-accent: rgba(123, 143, 255, 0.4);
+  --t-bg-accent-tint: rgba(123, 143, 255, 0.06);
+  --t-border-hover: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Light Theme ───────────────────────────────────────── */
+
+.light {
+  --t-base: #F5F5F7;
+  --t-surface: #FFFFFF;
+  --t-overlay: #F0F0F2;
+  --t-elevated: #E8E8EC;
+
+  --t-fg: #1A1A1E;
+  --t-fg-muted: #6B6D76;
+  --t-fg-faint: #9B9DA6;
+  --t-fg-ghost: #CDCED3;
+
+  --t-accent: #5B6FE6;
+  --t-accent-hover: #4D5FD4;
+
+  --t-focus-high: #2DA87E;
+  --t-focus-mid: #C89530;
+  --t-focus-low: #C04E4E;
+
+  --t-insight: #8B6FC0;
+  --t-streak: #C88530;
+  --t-neutral: #7C8291;
+
+  --t-accent-dim: #8B9BF0;
+  --t-focus-high-dim: #7EDDB8;
+  --t-focus-mid-dim: #E4C77A;
+  --t-focus-low-dim: #E09898;
+  --t-insight-dim: #BCA8E0;
+  --t-streak-dim: #E4B06A;
+
+  --t-base-focus: #EDEDED;
+  --t-surface-focus: #F8F8FA;
+
+  --t-shadow-surface: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --t-shadow-overlay: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  --t-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.06);
+
+  --t-border-subtle: rgba(0, 0, 0, 0.04);
+  --t-border-light: rgba(0, 0, 0, 0.06);
+  --t-border-medium: rgba(0, 0, 0, 0.08);
+  --t-border-accent: rgba(91, 111, 230, 0.35);
+  --t-bg-accent-tint: rgba(91, 111, 230, 0.06);
+  --t-border-hover: rgba(0, 0, 0, 0.12);
+}
+
+/* ── Base Styles ────────────────────────────────────────── */
 
 html {
   scroll-behavior: smooth;
@@ -32,27 +173,24 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -webkit-app-region: drag;
   overflow-y: auto;
-  background-color: var(--color-base);
-  color: var(--color-fg);
+  background-color: var(--t-base);
+  color: var(--t-fg);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button, input, select, a {
   -webkit-app-region: no-drag;
 }
 
-/* Scrollbar — visible only on hover/scroll */
+/* ── Scrollbar ──────────────────────────────────────────── */
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
-*:hover,
-*:active {
-  scrollbar-color: var(--color-hl-high) transparent;
+  scrollbar-color: var(--t-fg-ghost) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -64,15 +202,117 @@ button, input, select, a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: transparent;
+  background: var(--t-fg-ghost);
   border-radius: 3px;
-  transition: background 0.2s;
 }
 
-*:hover::-webkit-scrollbar-thumb {
-  background: var(--color-hl-med);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--t-fg-faint);
 }
 
-*:hover::-webkit-scrollbar-thumb:hover {
-  background: var(--color-hl-high);
+/* ── Glass Surfaces ─────────────────────────────────────── */
+
+.glass-overlay {
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  background: rgba(22, 23, 25, 0.8);
+  border: 1px solid var(--t-border-light);
 }
+
+.light .glass-overlay {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.glass-tooltip {
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  background: rgba(39, 41, 48, 0.88);
+  border: 1px solid var(--t-border-medium);
+}
+
+.light .glass-tooltip {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Session Atmosphere ─────────────────────────────────── */
+
+.session-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(10, 10, 12, 0.6) 100%),
+    var(--t-base-focus);
+}
+
+.light .session-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(245, 245, 247, 0.6) 100%),
+    var(--t-base-focus);
+}
+
+/* ── Focus Aura ─────────────────────────────────────────── */
+
+@keyframes aura-breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.03); }
+}
+
+.focus-aura {
+  position: absolute;
+  inset: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aura-color, rgba(123, 143, 255, 0.12)) 0%, transparent 70%);
+  animation: aura-breathe 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.focus-aura--still {
+  animation: none;
+  opacity: 0.15;
+}
+
+/* ── Flow Orbit Ring ────────────────────────────────────── */
+
+@keyframes flow-orbit {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -753; }
+}
+
+.flow-ring {
+  fill: none;
+  stroke: var(--t-focus-high);
+  stroke-width: 1.5;
+  stroke-dasharray: 20 733;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.flow-ring--active {
+  opacity: 0.5;
+  animation: flow-orbit 12s linear infinite;
+}
+
+/* ── Card Animations ────────────────────────────────────── */
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page Entrance ──────────────────────────────────────── */
+
+@keyframes page-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-enter {
+  animation: page-fade-in 500ms var(--ease-out) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

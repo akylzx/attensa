@@ -21,6 +21,7 @@ function createWindow(): BrowserWindow {
       nodeIntegration: false,
     },
     titleBarStyle: 'hiddenInset',
+    backgroundColor: '#161719',
     show: false,
   });
 

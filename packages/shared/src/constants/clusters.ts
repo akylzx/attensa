@@ -72,6 +72,20 @@ export const DEFAULT_CLUSTERS: AppCluster[] = [
   },
 ];
 
+// Self-app bundle IDs and names — excluded from tracking
+export const SELF_APP_BUNDLE_IDS = new Set([
+  'com.electron.attensa',
+  'com.electron.forge.attensa',
+  'attensa',
+]);
+
+export const SELF_APP_NAMES = new Set([
+  'Electron',
+  'electron',
+  'attensa',
+  'Attensa',
+]);
+
 // Browser bundle IDs — these get special window-title disambiguation
 export const BROWSER_BUNDLE_IDS = new Set([
   'com.google.Chrome',

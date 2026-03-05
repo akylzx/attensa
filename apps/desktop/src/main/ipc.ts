@@ -1,4 +1,6 @@
 import { ipcMain } from 'electron';
+import { v7 as uuidv7 } from 'uuid';
+import { SELF_APP_NAMES } from '@attensa/shared';
 import { sessionManager } from './tracker/session-manager.js';
 import {
   getSessionById,
@@ -9,6 +11,7 @@ import {
   getSessionContextBlocks,
   getMonthlySummary,
   getSessionsForMonth,
+  upsertMonthlySummary,
   updateSessionInsights,
   deleteSession,
 } from './db/queries.js';
@@ -63,10 +66,10 @@ export function registerIpcHandlers() {
     const events = getSessionEvents(sessionId);
     const blocks = getSessionContextBlocks(sessionId);
 
-    // Compute top apps from events
+    // Compute top apps from events (exclude self-app)
     const appTimeMap = new Map<string, number>();
     for (const ev of events) {
-      if (!ev.isIdle) {
+      if (!ev.isIdle && !SELF_APP_NAMES.has(ev.appName)) {
         appTimeMap.set(ev.appName, (appTimeMap.get(ev.appName) || 0) + ev.durationMs);
       }
     }
@@ -75,10 +78,11 @@ export function registerIpcHandlers() {
       .sort((a, b) => b.durationMs - a.durationMs)
       .slice(0, 10);
 
-    // Build app switch sequence
+    // Build app switch sequence (exclude self-app)
     const appSwitches: Array<{ from: string; to: string; timestamp: number }> = [];
     for (let i = 1; i < events.length; i++) {
-      if (!events[i].isIdle && !events[i - 1].isIdle && events[i].appName !== events[i - 1].appName) {
+      if (!events[i].isIdle && !events[i - 1].isIdle && events[i].appName !== events[i - 1].appName
+        && !SELF_APP_NAMES.has(events[i].appName) && !SELF_APP_NAMES.has(events[i - 1].appName)) {
         appSwitches.push({
           from: events[i - 1].appName,
           to: events[i].appName,
@@ -124,10 +128,12 @@ export function registerIpcHandlers() {
     const events = getSessionEvents(sessionId);
     if (!events.length) return null;
 
-    // Per-app time breakdown
+    const isSelf = (name: string) => SELF_APP_NAMES.has(name);
+
+    // Per-app time breakdown (exclude self-app)
     const appTimeMap = new Map<string, number>();
     for (const ev of events) {
-      if (!ev.isIdle) {
+      if (!ev.isIdle && !isSelf(ev.appName)) {
         appTimeMap.set(ev.appName, (appTimeMap.get(ev.appName) || 0) + ev.durationMs);
       }
     }
@@ -135,10 +141,12 @@ export function registerIpcHandlers() {
       .map(([appName, totalMs]) => ({ appName, totalMs }))
       .sort((a, b) => b.totalMs - a.totalMs);
 
-    // App switch sequence with timestamps and duration
+    // App switch sequence with timestamps and duration (exclude self-app)
     const switches: Array<{ from: string; to: string; timestamp: number; durationInFrom: number }> = [];
     for (let i = 1; i < events.length; i++) {
-      if (!events[i].isIdle && !events[i - 1].isIdle && events[i].appName !== events[i - 1].appName) {
+      if (!events[i].isIdle && !events[i - 1].isIdle
+        && events[i].appName !== events[i - 1].appName
+        && !isSelf(events[i].appName) && !isSelf(events[i - 1].appName)) {
         switches.push({
           from: events[i - 1].appName,
           to: events[i].appName,
@@ -148,9 +156,9 @@ export function registerIpcHandlers() {
       }
     }
 
-    // Timeline events (all non-idle events in order)
+    // Timeline events (all non-idle, non-self events in order)
     const timeline = events
-      .filter((e) => !e.isIdle)
+      .filter((e) => !e.isIdle && !isSelf(e.appName))
       .map((e) => ({
         appName: e.appName,
         timestamp: e.timestamp,
@@ -166,16 +174,35 @@ export function registerIpcHandlers() {
   });
 
   ipcMain.handle('recap:generate', async (_event, yearMonth: string) => {
-    const sessions = getSessionsForMonth(yearMonth);
-    if (!sessions.length) return null;
+    const monthSessions = getSessionsForMonth(yearMonth);
+    if (!monthSessions.length) return null;
 
-    const totalFocusTimeMs = sessions.reduce((sum, s) => sum + s.totalFocusTimeMs, 0);
-    const avgFragmentationScore = sessions.reduce((sum, s) => sum + s.focusFragmentationScore, 0) / sessions.length;
-    const avgRecoveryTimeMs = sessions.reduce((sum, s) => sum + s.avgRecoveryTimeMs, 0) / sessions.length;
+    const sessionCount = monthSessions.length;
+    const totalFocusTimeMs = monthSessions.reduce((sum, s) => sum + s.totalFocusTimeMs, 0);
+    const avgFocusTimePerSessionMs = totalFocusTimeMs / sessionCount;
+    const avgFragmentationScore = monthSessions.reduce((sum, s) => sum + s.focusFragmentationScore, 0) / sessionCount;
+    const avgRecoveryTimeMs = monthSessions.reduce((sum, s) => sum + s.avgRecoveryTimeMs, 0) / sessionCount;
+    const avgAppSwitchesPerSession = monthSessions.reduce((sum, s) => sum + s.appSwitchCount, 0) / sessionCount;
+    const totalInterruptions = monthSessions.reduce((sum, s) => sum + s.interruptionCount, 0);
+
+    // Top apps across all sessions
+    const appTotalMap = new Map<string, number>();
+    for (const s of monthSessions) {
+      const events = getSessionEvents(s.id);
+      for (const ev of events) {
+        if (!ev.isIdle && !SELF_APP_NAMES.has(ev.appName)) {
+          appTotalMap.set(ev.appName, (appTotalMap.get(ev.appName) || 0) + ev.durationMs);
+        }
+      }
+    }
+    const topApps = [...appTotalMap.entries()]
+      .map(([appName, durationMs]) => ({ appName, durationMs }))
+      .sort((a, b) => b.durationMs - a.durationMs)
+      .slice(0, 10);
 
     // Gather interruption sources from all sessions' context blocks
     const interruptionMap = new Map<string, number>();
-    for (const session of sessions) {
+    for (const session of monthSessions) {
       const blocks = getSessionContextBlocks(session.id);
       for (const b of blocks) {
         if (b.wasInterrupted) {
@@ -193,7 +220,7 @@ export function registerIpcHandlers() {
 
     // Weekly trend
     const weekMap = new Map<number, { total: number; count: number }>();
-    for (const s of sessions) {
+    for (const s of monthSessions) {
       const d = new Date(s.startedAt);
       const weekNum = Math.ceil(d.getDate() / 7);
       const entry = weekMap.get(weekNum) || { total: 0, count: 0 };
@@ -205,8 +232,9 @@ export function registerIpcHandlers() {
       .map(([weekNumber, { total, count }]) => ({ weekNumber, avgScore: total / count }))
       .sort((a, b) => a.weekNumber - b.weekNumber);
 
-    const recap = await generateMonthlyRecap(yearMonth, {
-      totalSessions: sessions.length,
+    // Generate AI recap
+    const aiRecap = await generateMonthlyRecap(yearMonth, {
+      totalSessions: sessionCount,
       totalFocusTimeMs,
       avgFragmentationScore,
       avgRecoveryTimeMs,
@@ -214,7 +242,31 @@ export function registerIpcHandlers() {
       weeklyTrend,
     });
 
-    return recap;
+    // Persist to DB
+    const summaryData = {
+      id: uuidv7(),
+      yearMonth,
+      generatedAt: Date.now(),
+      sessionCount,
+      totalFocusTimeMs,
+      avgFocusTimePerSessionMs: Math.round(avgFocusTimePerSessionMs),
+      avgAppSwitchesPerSession: Math.round(avgAppSwitchesPerSession),
+      avgRecoveryTimeMs: Math.round(avgRecoveryTimeMs),
+      avgFragmentationScore,
+      totalInterruptions,
+      topAppsJson: JSON.stringify(topApps),
+      topInterruptionSourcesJson: JSON.stringify(topInterruptionSources),
+      focusTrendJson: JSON.stringify(weeklyTrend),
+      aiRecapJson: aiRecap ? JSON.stringify(aiRecap) : null,
+    };
+
+    upsertMonthlySummary(summaryData);
+
+    // Return the summary in the same shape as getMonthlySummary
+    return {
+      ...summaryData,
+      avgFragmentationScore: Math.round(avgFragmentationScore * 1000),
+    };
   });
 
   // Settings

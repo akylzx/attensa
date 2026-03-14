@@ -11,7 +11,6 @@ export default defineConfig({
         'electron',
         'better-sqlite3',
         'active-win',
-        '@google/genai',
         ...builtinModules,
         ...builtinModules.map((m) => `node:${m}`),
       ],

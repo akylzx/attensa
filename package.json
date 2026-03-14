@@ -2,10 +2,15 @@
   "name": "attensa",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "workspaces": {
+    "packages": ["packages/*", "apps/*"],
+    "nohoist": [
+      "**/better-sqlite3",
+      "**/better-sqlite3/**",
+      "**/active-win",
+      "**/active-win/**"
+    ]
+  },
   "scripts": {
     "dev": "cd apps/desktop && npx electron-forge start",
     "build": "npm run build -w packages/shared && npm run build -w apps/desktop",

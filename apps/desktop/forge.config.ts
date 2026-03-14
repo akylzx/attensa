@@ -3,11 +3,29 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDMG } from '@electron-forge/maker-dmg';
 import { VitePlugin } from '@electron-forge/plugin-vite';
+import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
+
+import fs from 'fs';
+import path from 'path';
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     name: 'Attensa',
+  },
+  hooks: {
+    packageAfterCopy: async (_config, buildPath) => {
+      const rootModules = path.resolve(__dirname, '../../node_modules');
+      const nativeModules = ['better-sqlite3', 'active-win', 'bindings', 'file-uri-to-path'];
+
+      for (const mod of nativeModules) {
+        const src = path.join(rootModules, mod);
+        const dest = path.join(buildPath, 'node_modules', mod);
+        if (fs.existsSync(src) && !fs.existsSync(dest)) {
+          fs.cpSync(src, dest, { recursive: true});
+        }
+      }
+    }
   },
   makers: [
     new MakerSquirrel({}),
@@ -15,6 +33,7 @@ const config: ForgeConfig = {
     new MakerDMG({}),
   ],
   plugins: [
+    new AutoUnpackNativesPlugin({}),
     new VitePlugin({
       build: [
         {

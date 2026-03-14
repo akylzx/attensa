@@ -16,7 +16,7 @@ const config: ForgeConfig = {
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
       const rootModules = path.resolve(__dirname, '../../node_modules');
-      const nativeModules = ['better-sqlite3', 'active-win', 'bindings', 'file-uri-to-path'];
+      const nativeModules = ['better-sqlite3', 'active-win', 'bindings', 'file-uri-to-path', 'node-addon-api'];
 
       for (const mod of nativeModules) {
         const src = path.join(rootModules, mod);
@@ -28,7 +28,12 @@ const config: ForgeConfig = {
     }
   },
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      name: 'Attensa',
+      setupExe: 'AttensaSetup.exe',
+      authors: 'Attensa',
+      description: 'Attensa Desktop App',
+    }),
     new MakerZIP({}, ['darwin']),
     new MakerDMG({}),
   ],

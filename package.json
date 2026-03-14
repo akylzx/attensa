@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": {
-    "packages": ["packages/*", "apps/*"],
+    "packages": [
+      "packages/*",
+      "apps/*"
+    ],
     "nohoist": [
       "**/better-sqlite3",
       "**/better-sqlite3/**",
@@ -15,5 +18,12 @@
     "dev": "cd apps/desktop && npx electron-forge start",
     "build": "npm run build -w packages/shared && npm run build -w apps/desktop",
     "start": "cd apps/desktop && npx electron-forge start"
+  },
+  "dependencies": {
+    "bufferutil": "^4.1.0",
+    "utf-8-validate": "^6.0.6"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^3.2.9"
   }
 }
